@@ -1,0 +1,70 @@
+ /* Read Quadrature Encoder
+   Connect Encoder to Pins encoder0PinA, encoder0PinB, and +5V.
+
+   Sketch by max wolf / www.meso.net
+   v. 0.1 - very basic functions - mw 20061220
+
+*/
+
+int val;
+#define encoderPinA 2
+#define encoderPinB 3
+int encoderPos = 0;
+int encoderPinALast = LOW;
+int encoderAstate = LOW;
+unsigned long last_time;
+int siirtyma = 0;
+int lt = 0;
+
+void setup() {
+  pinMode (encoderPinA, INPUT_PULLUP);
+  pinMode (encoderPinB, INPUT_PULLUP);
+  Serial.begin (9600);
+}
+
+void loop() {
+  encoderAstate = digitalRead(encoderPinA);
+  if ((encoderPinALast == LOW) && (encoderAstate == HIGH)) {
+    // lt = millis() - last_time;
+
+    if (millis() - last_time > 200)
+    {
+      siirtyma = 1;
+    }
+    else if (millis() - last_time <= 100 && millis() - last_time > 75)
+    {
+      siirtyma = 2;
+    }
+    else if (millis() - last_time <= 75 && millis() - last_time > 50)
+    {
+      siirtyma = 3;
+    }
+    else if (millis() - last_time <= 50 && millis() - last_time > 25)
+    {
+      siirtyma = 4;
+    }
+    else if (millis() - last_time <= 25 && millis() - last_time > 0)
+    {
+      siirtyma = 5;
+    }
+
+    last_time = millis();
+
+    if (digitalRead(encoderPinB) == LOW) {
+      encoderPos = encoderPos - siirtyma;
+    } 
+    else {
+      encoderPos = encoderPos + siirtyma;
+    }
+
+    encoderPos = constrain(encoderPos, 0, 500);
+    
+    Serial.println (encoderPos);
+    //Serial.println (lt);
+    //Serial.print ("\n");
+  }
+  encoder0PinALast = encoderAstate;
+  //Serial.println (encoder0Pos);
+
+}
+
